@@ -25,15 +25,17 @@ public class GrappleController : MonoBehaviour {
 
     private GrappleHookController endController;
     private GrappleBoundaryController boundaryController;
+    private GrappleAimer grappleAimer;
     
     private bool isGoingForGrapple;
     private bool isGrappling;
+    private bool isGrappled;
 
     private float currentGrappleLength;
     private Vector2 directionOfGrapple;
     private Vector2 currentGrappleHookPosition;
     private void Awake() {
-        Cursor.visible = false;
+        // Cursor.visible = false;
         keybindController = GetComponentInParent<KeybindController>();
         renderer = GetComponent<LineRenderer>();
         renderer.enabled = false;
@@ -46,35 +48,22 @@ public class GrappleController : MonoBehaviour {
         this.fixedDeltaTime = Time.fixedDeltaTime;
         endController = GetComponentInChildren<GrappleHookController>();
         boundaryController = GetComponentInChildren<GrappleBoundaryController>();
+        grappleAimer = GetComponentInChildren<GrappleAimer>();
     }
 
     private void Update() {
         if (isGoingForGrapple) {
-            Vector2 endPointPos = keybindController.ReadMouseValueInWorld();
+            Vector2 mousePos = keybindController.ReadMouseValueInWorld();
             Vector2 startPointPos = transform.position;
-            directionOfGrapple = (endPointPos - startPointPos).normalized;
-            //Check for within radius
-            float squaredDistance = MathUtils.SquaredDistance(startPointPos, endPointPos);
-            RaycastHit2D hit = Physics2D.Raycast(startPointPos, directionOfGrapple, radius, grapplePointMask);
-            if (hit.collider != null) {
-                endPointPos = hit.point;
-            } else if (squaredDistance > radius * radius) {
-                endPointPos = directionOfGrapple * radius + startPointPos;
+            directionOfGrapple = (mousePos - startPointPos).normalized;
 
-            }
-
-            int spriteCount = Mathf.FloorToInt(Vector3.Distance(endPointPos, startPointPos) / spriteScale);
-            Vector3[] positions = new Vector3[] {new Vector3(startPointPos.x, startPointPos.y, 5), new Vector3(endPointPos.x, endPointPos.y, 5)};
-            renderer.positionCount = positions.Length;
-            renderer.SetPositions(positions);
-            if (renderer.material != null) {
-                renderer.material.mainTextureScale = new Vector2(spriteScale * spriteCount, 1);
-            }
-            endController.GrappleUpdate(endPointPos);
-            
+            grappleAimer.Enable();
+            grappleAimer.UpdateCrosshair(mousePos);
             boundaryController.RenderCircle(radius, startPointPos);
             
+
         } else if (isGrappling) {
+            grappleAimer.Disable();
             Vector2 increase = directionOfGrapple * grappleSpeed * Time.deltaTime;
             currentGrappleHookPosition += increase;
             renderer.SetPosition(0, transform.position);
@@ -86,7 +75,21 @@ public class GrappleController : MonoBehaviour {
                 renderer.enabled = false;
                 endController.Disable();
             }
-        } else {
+
+            RaycastHit2D raycastHit2D = Physics2D.CircleCast(currentGrappleHookPosition, 0.1f, Vector2.zero, 0, grapplePointMask);
+
+            if (raycastHit2D.collider != null)
+            {
+                isGrappling = false;
+                isGrappled = true;
+            }
+            
+        } else if (isGrappled) {
+            //keep track of stuff
+            
+        }
+        else
+        {
             renderer.positionCount = 0;
         }
     }
@@ -112,6 +115,7 @@ public class GrappleController : MonoBehaviour {
         currentGrappleLength = 0;
         currentGrappleHookPosition = transform.position;
         endController.Enable();
+        grappleAimer.Disable();
     }
 
     IEnumerator GrappleTimer() {
