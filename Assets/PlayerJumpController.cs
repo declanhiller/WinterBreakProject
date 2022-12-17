@@ -50,7 +50,7 @@ public class PlayerJumpController : MonoBehaviour {
         {
             rb.velocity = new Vector2(rb.velocity.x, 0);
             rb.AddForce(Vector2.up * jumpForce * 10);
-        }
+        } 
     }
 
     private void EndJump(InputAction.CallbackContext context)

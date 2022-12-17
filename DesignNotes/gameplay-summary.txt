@@ -1,0 +1,4 @@
+Grappling Hook
+- Player can swing and grapple between objects on the map to traverse
+- Player also has a spear that is a porcupine quill
+- Player can do usual movements such as move, jump, etc... but also can rappel on edges.
