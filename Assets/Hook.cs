@@ -34,11 +34,9 @@ public class Hook : MonoBehaviour
     {
         if (move)
         {
-            transform.Translate(speed * direction * Time.deltaTime);
+            // transform.Translate(speed * direction * Time.deltaTime);
         }
-        
-        
-        
+
         if (maxDistance * maxDistance <= MathUtils.SquaredDistance(firepoint.transform.position, transform.position))
         {
             missed = true;
@@ -54,14 +52,18 @@ public class Hook : MonoBehaviour
         this.maxTarget = (Vector2) transform.position + (direction * this.maxDistance);
         this.direction = direction.normalized;
         this.speed = speed;
-
+        rb.velocity = speed * direction;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log(other.gameObject.name);
         didHook = true;
         move = false;
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        rb.velocity = new Vector2(0, 0);
     }
 
     public bool DidHook()
