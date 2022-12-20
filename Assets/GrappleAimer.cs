@@ -3,13 +3,17 @@ using UnityEditor;
 using UnityEngine;
 public class GrappleAimer : MonoBehaviour
 {
-
-    private SpriteRenderer renderer;
     
-    private void Start()
+    private SpriteRenderer renderer;
+
+    private void Awake()
     {
         renderer = GetComponent<SpriteRenderer>();
-        Disable();
+    }
+
+    private void Start()
+    {
+        
     }
 
     public void UpdateCrosshair(Vector2 mousePos)
@@ -17,12 +21,17 @@ public class GrappleAimer : MonoBehaviour
         transform.right = mousePos - (Vector2) this.transform.position;
     }
 
-    public void Enable()
+    public Vector2 GetDirection()
+    {
+        return transform.right.normalized;
+    }
+
+    private void OnEnable()
     {
         renderer.enabled = true;
     }
 
-    public void Disable()
+    private void OnDisable()
     {
         renderer.enabled = false;
     }
