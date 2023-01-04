@@ -18,7 +18,7 @@ public class Grapple : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        hook.enabled = false;
+        // hook.enabled = false;
     }
 
     // Update is called once per frame
@@ -34,9 +34,9 @@ public class Grapple : MonoBehaviour
 
     public void StartGrappleShoot(Vector2 direction, float maxDistance)
     {
-        hook.enabled = true;
-        isShootingGrapple = true;
-        hook.MoveInDirection(direction, speed, maxDistance);
+        // hook.enabled = true;
+        // isShootingGrapple = true;
+        // hook.ShootInDirection(direction, speed, maxDistance);
     }
 
     public void OnEnable()
@@ -48,6 +48,12 @@ public class Grapple : MonoBehaviour
     {
         isShootingGrapple = false;
         isGrappleConnected = false;
-        hook.enabled = false;
+        // hook.enabled = false;
+    }
+
+    public bool DidHookConnect()
+    {
+        // return hook.DidHookConnect();
+        return false;
     }
 }

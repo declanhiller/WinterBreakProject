@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Hook : MonoBehaviour
@@ -8,12 +9,12 @@ public class Hook : MonoBehaviour
     private Rigidbody2D rb;
     private Collider2D collider;
     private SpriteRenderer renderer;
-    private SpringJoint2D springJoint;
-    
+
     [SerializeField]
     private Rope rope;
 
     [SerializeField] private Transform firepoint;
+    [SerializeField] private Transform player;
     
     [SerializeField] private LayerMask grappleMask;
 
@@ -26,13 +27,15 @@ public class Hook : MonoBehaviour
 
     private Vector2 direction;
     private float speed;
+    private float defaultGravityScale;
+
+    [SerializeField] private float launchSpeed = 1;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         collider = GetComponent<Collider2D>();
         renderer = GetComponent<SpriteRenderer>();
-        springJoint = GetComponent<SpringJoint2D>();
     }
 
     private void Start()
@@ -52,9 +55,8 @@ public class Hook : MonoBehaviour
         {
             travelDistance = hit2D.distance;
             setMove = false;
-            springJoint.enabled = true;
-            float distance = Vector2.Distance(firepoint.transform.position, transform.position);
-            springJoint.distance = distance;
+            // joint.enabled = true;
+            didHook = true;
         }
         
         if(maxDistance * maxDistance < MathUtils.SquaredDistance(firepoint.transform.position, transform.position + (Vector3) (proposedTravelDistance * direction)))
@@ -62,6 +64,8 @@ public class Hook : MonoBehaviour
             travelDistance = ((firepoint.transform.position + (Vector3) (maxDistance * direction)) - transform.position).magnitude;
             setMove = false;
         }
+        
+        
 
 
         if (move)
@@ -74,7 +78,7 @@ public class Hook : MonoBehaviour
         move = setMove;
     }
 
-    public void MoveInDirection(Vector2 direction, float speed, float maxDistance)
+    public void ShootInDirection(Vector2 direction, float speed, float maxDistance)
     {
         rope.enabled = true;
         move = true;
@@ -97,12 +101,16 @@ public class Hook : MonoBehaviour
     {
         collider.enabled = false;
         renderer.enabled = false;
-        springJoint.enabled = false;
         rope.enabled = false;
         move = false;
         missed = false;
         didHook = false;
         rb.velocity = Vector2.zero;
         transform.position = firepoint.position;
+    }
+
+    public bool DidHookConnect()
+    {
+        return didHook;
     }
 }

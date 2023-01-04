@@ -4,21 +4,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerMoveController : MonoBehaviour {
+public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
 
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private float acceleration = 100f;
 
     private KeybindController keybindController;
+    private PlayerController playerController;
     private Rigidbody2D rb;
 
     private bool isFullStopping;
 
+    public bool canMove;
+
     //1 for right, -1 for left, 0 for neither
     private int direction = 0;
-    
+
+    private void Awake()
+    {
+        playerController = GetComponentInParent<PlayerController>();
+        playerController.AddFunction(this);
+    }
+
     void Start() {
-        keybindController = GetComponent<KeybindController>();
         rb = GetComponent<Rigidbody2D>();
     }
     
@@ -26,6 +34,7 @@ public class PlayerMoveController : MonoBehaviour {
     {
         float currentHorizontalSpeed = rb.velocity.x;
         float inputtedValue = keybindController.ReadRunValue();
+        if (!canMove) inputtedValue = 0;
         currentHorizontalSpeed += inputtedValue * acceleration * Time.deltaTime * 10;
         currentHorizontalSpeed = Mathf.Clamp(currentHorizontalSpeed, -moveSpeed, moveSpeed);
         if (inputtedValue == 0 && currentHorizontalSpeed != 0)
@@ -64,5 +73,15 @@ public class PlayerMoveController : MonoBehaviour {
         }
         
         rb.velocity = new Vector2(currentHorizontalSpeed, rb.velocity.y);
+    }
+
+    public void SetKeybinds(KeybindController keybindController)
+    {
+        this.keybindController = keybindController;
+    }
+
+    public void ReceiveMessage(string msg)
+    {
+        
     }
 }

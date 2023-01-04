@@ -9,7 +9,10 @@ public class KeybindController : MonoBehaviour {
     private Camera camera;
     
     void Awake() {
-        keybinds = new PlayerKeybinds();
+        if (keybinds == null)
+        {
+            keybinds = new PlayerKeybinds();
+        }
         keybinds.Enable();
         camera = Camera.main;
     }
@@ -28,6 +31,11 @@ public class KeybindController : MonoBehaviour {
 
     public void SetEndGrappleListener(Action<InputAction.CallbackContext> grapplerListener) {
         keybinds.Player.Grapple.canceled += grapplerListener;
+    }
+
+    public void SetStartAttackListener(Action<InputAction.CallbackContext> attackListener)
+    {
+        keybinds.Player.Attack.started += attackListener;
     }
     
     public void AddToJumpListener(Action<InputAction.CallbackContext> action) {

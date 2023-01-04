@@ -4,8 +4,10 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class GrappleControllerV2 : MonoBehaviour
+public class PlayerGrappleController : MonoBehaviour
 {
+
+    private PlayerController playerController;
     
     [SerializeField] private float slowedDownTime = 0f;
     [SerializeField] private float timeRate = 0.1f;
@@ -29,6 +31,8 @@ public class GrappleControllerV2 : MonoBehaviour
     
     private Coroutine slowDownCoroutine;
 
+    public const string GRAPPLE_STARTED = "GRAPPLE_STARTED";
+    public const string GRAPPLE_ENDED = "GRAPPLE_ENDED";
     
     
     private void Awake()
@@ -38,8 +42,8 @@ public class GrappleControllerV2 : MonoBehaviour
 
     private void Start()
     {
-        keybindController.SetStartGrappleListener(StartAiming);
-        keybindController.SetEndGrappleListener(ShootOut);
+        keybindController.SetStartGrappleListener(StartGrappleAction);
+        keybindController.SetEndGrappleListener(EndGrappleAction);
         boundary.enabled = false;
         grappleAimer.enabled = false;
         grapple.enabled = false;
@@ -49,6 +53,12 @@ public class GrappleControllerV2 : MonoBehaviour
 
     private void Update()
     {
+
+        if (grapple.DidHookConnect())
+        {
+            state = GrappleState.CONNECTED;
+        }
+        
         switch (state)
         {
             //should not have to write child specific update code in here...
@@ -62,16 +72,27 @@ public class GrappleControllerV2 : MonoBehaviour
                 
                 break;
             case GrappleState.CONNECTED:
+                
                 break;
         }
     }
 
-    private void StartAiming(InputAction.CallbackContext context)
+    private void StartGrappleAction(InputAction.CallbackContext context)
     {
-        grappleAimer.enabled = true;
-        boundary.enabled = true;
-        state = GrappleState.AIMING;
-        slowDownCoroutine = StartCoroutine(SlowDownTime(slowedDownTime));
+        if (state == GrappleState.STOWED)
+        {
+            grappleAimer.enabled = true;
+            boundary.enabled = true;
+            state = GrappleState.AIMING;
+            slowDownCoroutine = StartCoroutine(SlowDownTime(slowedDownTime));
+            playerController.SendMsg(GRAPPLE_STARTED);
+        }
+        else if (state == GrappleState.CONNECTED)
+        {
+            grapple.enabled = false;
+            state = GrappleState.STOWED;
+            playerController.SendMsg(GRAPPLE_ENDED);
+        }
     }
 
     private void AimingUpdate()
@@ -82,20 +103,23 @@ public class GrappleControllerV2 : MonoBehaviour
         boundary.RenderCircle(radius, startPointPos);
     }
 
-    private void ShootOut(InputAction.CallbackContext context)
+    private void EndGrappleAction(InputAction.CallbackContext context)
     {
-        RestoreTime();
-        grappleAimer.enabled = false;
-        boundary.enabled = false;
-        state = GrappleState.SHOOTING;
-        grapple.enabled = true;
-        grapple.StartGrappleShoot(grappleAimer.GetDirection(), radius);
-        grapple.SetOnGrapple(OnGrapple);
+        if (state == GrappleState.AIMING)
+        {
+            RestoreTime();
+            grappleAimer.enabled = false; 
+            boundary.enabled = false;
+            state = GrappleState.SHOOTING;
+            grapple.enabled = true;
+            grapple.StartGrappleShoot(grappleAimer.GetDirection(), radius);
+            grapple.SetOnGrapple(OnGrapple);
+        }
     }
 
     private void OnGrapple()
     {
-        state = GrappleState.CONNECTED;
+        state = GrappleState.SHOOTING;
     }
     
     
