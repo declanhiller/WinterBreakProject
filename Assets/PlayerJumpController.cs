@@ -23,6 +23,12 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
     
     private bool isGrappling;
 
+    public const string JUMP_STARTED = "JUMP_STARTED";
+    public const string LANDED = "LANDED";
+
+    public int numberOfTicksOnGround = 0;
+    private bool canCheckForGroundTicks = true;
+
     private void Awake()
     {
         playerController = GetComponentInParent<PlayerController>();
@@ -34,7 +40,7 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
         coyoteTicker = coyoteTime;
     }
 
-    private void Update()
+    public void Tick()
     {
         isGrounded = IsGrounded();
         if (isGrounded)
@@ -58,10 +64,20 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
         if (isGrappling) return;
         if (isGrounded || canCoyote)
         {
+            numberOfTicksOnGround = 0;
+            canCheckForGroundTicks = false;
+            playerController.SendMsg(JUMP_STARTED);
             rb.velocity = new Vector2(rb.velocity.x, 0);
             rb.AddForce(Vector2.up * jumpForce * 10);
+            Invoke(nameof(EnableCheckForGroundTicks), 0.1f);
         } 
     }
+
+    void EnableCheckForGroundTicks()
+    {
+        canCheckForGroundTicks = true;
+    }
+    
 
     private void EndJump(InputAction.CallbackContext context)
     {
@@ -72,9 +88,20 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
     }
 
     private bool IsGrounded() {
-        RaycastHit2D raycastHit2D = Physics2D.Raycast(jumpPoint.position, Vector2.down, 0.3f, ground);
+        RaycastHit2D raycastHit2D = Physics2D.Raycast(jumpPoint.position, Vector2.down, 0.05f, ground);
+
+        bool grounded = raycastHit2D.collider != null;
+
+        if (grounded && canCheckForGroundTicks)
+        {
+            if (numberOfTicksOnGround == 0)
+            {
+                playerController.SendMsg(LANDED);
+            }
+            numberOfTicksOnGround++;
+        }
         
-        return raycastHit2D.collider != null;
+        return grounded;
     }
 
     public void SetKeybinds(KeybindController keybindController)
@@ -94,5 +121,10 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
                 isGrappling = false;
                 break;
         }
+    }
+
+    public int GetPriority()
+    {
+        throw new NotImplementedException();
     }
 }

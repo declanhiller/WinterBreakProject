@@ -55,6 +55,11 @@ public class PlayerSpearController : MonoBehaviour, IPlayerFunctionController
     }
 
 
+    public void Tick()
+    {
+        
+    }
+
     public void SetKeybinds(KeybindController keybindController)
     {
         keybindController.SetStartAttackListener(Attack);
@@ -63,6 +68,11 @@ public class PlayerSpearController : MonoBehaviour, IPlayerFunctionController
     public void ReceiveMessage(string msg)
     {
         
+    }
+
+    public int GetPriority()
+    {
+        throw new NotImplementedException();
     }
 
 

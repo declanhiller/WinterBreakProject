@@ -9,13 +9,16 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private float acceleration = 100f;
 
+    [SerializeField] private Transform playerFeet;
+    [SerializeField] private LayerMask groundMask;
+    
     private KeybindController keybindController;
     private PlayerController playerController;
     private Rigidbody2D rb;
 
     private bool isFullStopping;
 
-    public bool canMove;
+    private bool isFlyingThroughAir;
 
     //1 for right, -1 for left, 0 for neither
     private int direction = 0;
@@ -30,13 +33,51 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
         rb = GetComponent<Rigidbody2D>();
     }
     
-    void Update()
+    public void Tick()
+    {
+        float inputtedValue = keybindController.ReadRunValue();
+
+        Vector2 velocity = Vector2.zero;
+        
+
+        velocity = GroundedMovement(inputtedValue);
+
+        rb.velocity = velocity;
+
+        if (!isFlyingThroughAir)
+        {
+            RotateToNormalsOfGround(velocity.x);
+        }
+        
+
+    }
+    
+    
+    
+
+    private void RotateToNormalsOfGround(float velocity)
+    {
+        RaycastHit2D raycastHit2D = Physics2D.Raycast(playerFeet.position, Vector2.down, 1f, groundMask);
+        if (raycastHit2D.collider != null)
+        {
+            Vector2 normal = raycastHit2D.normal;
+            Debug.Log(normal);
+            transform.rotation = Quaternion.FromToRotation(transform.up, normal) * transform.rotation;
+        }
+    }
+
+    private Vector2 AirMovement(float inputtedValue)
+    {
+        return Vector2.zero;
+    }
+
+    public Vector2 GroundedMovement(float inputtedValue)
     {
         float currentHorizontalSpeed = rb.velocity.x;
-        float inputtedValue = keybindController.ReadRunValue();
-        if (!canMove) inputtedValue = 0;
+
         currentHorizontalSpeed += inputtedValue * acceleration * Time.deltaTime * 10;
         currentHorizontalSpeed = Mathf.Clamp(currentHorizontalSpeed, -moveSpeed, moveSpeed);
+
         if (inputtedValue == 0 && currentHorizontalSpeed != 0)
         {
             isFullStopping = true;
@@ -72,7 +113,7 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
             direction = inputtedValue > 0 ? 1 : -1;
         }
         
-        rb.velocity = new Vector2(currentHorizontalSpeed, rb.velocity.y);
+        return new Vector2(currentHorizontalSpeed, rb.velocity.y);
     }
 
     public void SetKeybinds(KeybindController keybindController)
@@ -82,6 +123,19 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
 
     public void ReceiveMessage(string msg)
     {
-        
+        switch (msg)
+        {
+            case PlayerJumpController.JUMP_STARTED:
+                isFlyingThroughAir = true;
+                break;
+            case PlayerJumpController.LANDED:
+                isFlyingThroughAir = false;
+                break;
+        }
+    }
+
+    public int GetPriority()
+    {
+        throw new NotImplementedException();
     }
 }

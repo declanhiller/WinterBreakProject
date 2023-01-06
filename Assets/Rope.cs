@@ -27,7 +27,6 @@ public class Rope : MonoBehaviour
 
     private void OnEnable()
     {
-        Debug.Log("weeeeeeeee");
         renderer.enabled = true;
     }
 
