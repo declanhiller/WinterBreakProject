@@ -72,7 +72,7 @@ public class PlayerSpearController : MonoBehaviour, IPlayerFunctionController
 
     public int GetPriority()
     {
-        throw new NotImplementedException();
+        return 3;
     }
 
 

@@ -11,6 +11,7 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
     [SerializeField] private float coyoteTime = 0.3f;
 
     [SerializeField] private Transform jumpPoint;
+    [SerializeField] private Transform spriteTransform;
     
     private float coyoteTicker;
 
@@ -23,11 +24,8 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
     
     private bool isGrappling;
 
-    public const string JUMP_STARTED = "JUMP_STARTED";
+    public const string LEFT_GROUND = "LEFT_GROUND";
     public const string LANDED = "LANDED";
-
-    public int numberOfTicksOnGround = 0;
-    private bool canCheckForGroundTicks = true;
 
     private void Awake()
     {
@@ -42,7 +40,21 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
 
     public void Tick()
     {
+
+        bool prevIsGrounded = isGrounded;
+        
         isGrounded = IsGrounded();
+        
+        if (!prevIsGrounded && isGrounded)
+        {
+            playerController.SendMsg(LANDED);
+        }
+
+        if (prevIsGrounded && !isGrounded)
+        {
+            playerController.SendMsg(LEFT_GROUND);
+        }
+        
         if (isGrounded)
         {
                 canCoyote = true;
@@ -57,6 +69,19 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
                 canCoyote = false;
             }
         }
+
+        RotateToCorrectLanding();
+
+    }
+
+    private void RotateToCorrectLanding()
+    {
+        RaycastHit2D raycastHit2D = Physics2D.Raycast(jumpPoint.position, Vector2.down, 0.2f, ground);
+        if (raycastHit2D.collider != null)
+        {
+            Vector2 normal = raycastHit2D.normal;
+            spriteTransform.rotation = Quaternion.FromToRotation(spriteTransform.up, normal) * spriteTransform.rotation;
+        }
     }
 
     private void Jump(InputAction.CallbackContext context)
@@ -64,20 +89,47 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
         if (isGrappling) return;
         if (isGrounded || canCoyote)
         {
-            numberOfTicksOnGround = 0;
-            canCheckForGroundTicks = false;
-            playerController.SendMsg(JUMP_STARTED);
+            playerController.SendMsg(LEFT_GROUND);
             rb.velocity = new Vector2(rb.velocity.x, 0);
             rb.AddForce(Vector2.up * jumpForce * 10);
-            Invoke(nameof(EnableCheckForGroundTicks), 0.1f);
+            StartCoroutine(RotatePlayerToVerticalPosition());
         } 
     }
 
-    void EnableCheckForGroundTicks()
+    IEnumerator RotatePlayerToVerticalPosition()
     {
-        canCheckForGroundTicks = true;
+        float eulerAnglesZ = spriteTransform.eulerAngles.z;
+        int direction = eulerAnglesZ < 180 ? -1 : 1;
+        while (eulerAnglesZ != 0)
+        {
+            float zAngleChange = 150 * Time.deltaTime * direction;
+            bool setToZero = false;
+            if (direction == 1)
+            {
+                if (zAngleChange + eulerAnglesZ > 360)
+                {
+                    setToZero = true;
+                }
+            } else
+            {
+                if (eulerAnglesZ + zAngleChange < 0)
+                {
+                    setToZero = true;
+                }
+            }
+
+            spriteTransform.Rotate(0, 0, zAngleChange);
+            if (setToZero)
+            {
+                var eulerAngles = spriteTransform.eulerAngles;
+                eulerAngles = new Vector3(eulerAngles.x, eulerAngles.y, 0);
+                spriteTransform.eulerAngles = eulerAngles;
+            }
+            eulerAnglesZ = spriteTransform.eulerAngles.z;
+            yield return new WaitForEndOfFrame();
+        }
     }
-    
+
 
     private void EndJump(InputAction.CallbackContext context)
     {
@@ -92,14 +144,15 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
 
         bool grounded = raycastHit2D.collider != null;
 
-        if (grounded && canCheckForGroundTicks)
-        {
-            if (numberOfTicksOnGround == 0)
-            {
-                playerController.SendMsg(LANDED);
-            }
-            numberOfTicksOnGround++;
-        }
+        // if (grounded && canCheckForGroundTicks)
+        // {
+        //     if (numberOfTicksOnGround == 0)
+        //     {
+        //         rb.gravityScale = 0;
+        //         playerController.SendMsg(LANDED);
+        //     }
+        //     numberOfTicksOnGround++;
+        // }
         
         return grounded;
     }
@@ -125,6 +178,6 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
 
     public int GetPriority()
     {
-        throw new NotImplementedException();
+        return 0;
     }
 }

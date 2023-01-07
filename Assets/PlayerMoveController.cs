@@ -16,9 +16,13 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
     private PlayerController playerController;
     private Rigidbody2D rb;
 
+    [SerializeField] private Transform spriteTransform;
+
     private bool isFullStopping;
 
-    private bool isFlyingThroughAir;
+    private bool isFlyingThroughAir = true;
+
+    private Vector2 vectorDirectionOfSlopePlayerIsOn;
 
     //1 for right, -1 for left, 0 for neither
     private int direction = 0;
@@ -38,42 +42,89 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
         float inputtedValue = keybindController.ReadRunValue();
 
         Vector2 velocity = Vector2.zero;
-        
-
-        velocity = GroundedMovement(inputtedValue);
-
-        rb.velocity = velocity;
 
         if (!isFlyingThroughAir)
         {
-            RotateToNormalsOfGround(velocity.x);
+            RotateNormalsToCorrectOrientation();
+            velocity = GroundedMovement(inputtedValue);
+        }
+        else
+        {
+            velocity = AerialMovement(inputtedValue);
         }
         
-
+        rb.velocity = velocity;
     }
-    
-    
-    
 
-    private void RotateToNormalsOfGround(float velocity)
+    private Vector2 GroundedMovement(float inputtedValue)
     {
-        RaycastHit2D raycastHit2D = Physics2D.Raycast(playerFeet.position, Vector2.down, 1f, groundMask);
+        float currentSpeed = rb.velocity.magnitude;
+
+        if (rb.velocity.x < 0)
+        {
+            currentSpeed *= -1;
+        }
+        
+        currentSpeed += inputtedValue * acceleration * Time.deltaTime * 10;
+        currentSpeed = Mathf.Clamp(currentSpeed, -moveSpeed, moveSpeed);
+
+        if (inputtedValue == 0 && currentSpeed != 0)
+        {
+            isFullStopping = true;
+        }
+        else
+        {
+            isFullStopping = false;
+        }
+
+        if (inputtedValue > 0)
+        {
+            direction = 1;
+        } else if (inputtedValue < 0)
+        {
+            direction = -1;
+        }
+
+
+        if (isFullStopping)
+        {
+            currentSpeed -= direction * acceleration * Time.deltaTime * 10;
+            if (currentSpeed <= 0 && direction > 0 || currentSpeed >= 0 && direction < 0)
+            {
+                currentSpeed = 0;
+                isFullStopping = false;
+                direction = 0;
+            }
+        } else if (inputtedValue > 0 && direction < 0 || inputtedValue < 0 && direction > 0) //let player change directions on a dime instead of slowly adding force in the other direction
+        {
+            currentSpeed = 0;
+            currentSpeed += inputtedValue * acceleration * Time.deltaTime * 10;
+            direction = inputtedValue > 0 ? 1 : -1;
+        }
+        
+        Debug.DrawRay(transform.position, currentSpeed * vectorDirectionOfSlopePlayerIsOn, Color.black);
+        
+        return currentSpeed * vectorDirectionOfSlopePlayerIsOn;
+        
+    }
+
+    private void RotateNormalsToCorrectOrientation()
+    {
+        RaycastHit2D raycastHit2D = Physics2D.Raycast(playerFeet.position, Vector2.down, 0.1f, groundMask);
         if (raycastHit2D.collider != null)
         {
             Vector2 normal = raycastHit2D.normal;
-            Debug.Log(normal);
-            transform.rotation = Quaternion.FromToRotation(transform.up, normal) * transform.rotation;
+            vectorDirectionOfSlopePlayerIsOn = -Vector2.Perpendicular(normal).normalized;
+            Debug.DrawRay(raycastHit2D.point, vectorDirectionOfSlopePlayerIsOn, Color.green);
+            Debug.DrawRay(raycastHit2D.point, -vectorDirectionOfSlopePlayerIsOn, Color.red);
+            spriteTransform.rotation = Quaternion.FromToRotation(spriteTransform.up, normal) * spriteTransform.rotation;
         }
     }
 
-    private Vector2 AirMovement(float inputtedValue)
-    {
-        return Vector2.zero;
-    }
-
-    public Vector2 GroundedMovement(float inputtedValue)
+    public Vector2 AerialMovement(float inputtedValue)
     {
         float currentHorizontalSpeed = rb.velocity.x;
+
 
         currentHorizontalSpeed += inputtedValue * acceleration * Time.deltaTime * 10;
         currentHorizontalSpeed = Mathf.Clamp(currentHorizontalSpeed, -moveSpeed, moveSpeed);
@@ -125,7 +176,7 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
     {
         switch (msg)
         {
-            case PlayerJumpController.JUMP_STARTED:
+            case PlayerJumpController.LEFT_GROUND:
                 isFlyingThroughAir = true;
                 break;
             case PlayerJumpController.LANDED:
@@ -136,6 +187,6 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
 
     public int GetPriority()
     {
-        throw new NotImplementedException();
+        return 5;
     }
 }
