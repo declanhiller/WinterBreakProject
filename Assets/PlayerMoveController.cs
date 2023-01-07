@@ -16,9 +16,14 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
     private PlayerController playerController;
     private Rigidbody2D rb;
 
+    [SerializeField] private PhysicsMaterial2D frictionlessMaterial;
+    [SerializeField] private PhysicsMaterial2D allFrictionMaterial;
+
     [SerializeField] private Transform spriteTransform;
 
     private bool isFullStopping;
+
+    private bool isFinishedStopping;
 
     private bool isFlyingThroughAir = true;
 
@@ -52,7 +57,9 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
         {
             velocity = AerialMovement(inputtedValue);
         }
-        
+
+        rb.sharedMaterial = inputtedValue == 0 ? allFrictionMaterial : frictionlessMaterial;
+
         rb.velocity = velocity;
     }
 
@@ -92,6 +99,7 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
             if (currentSpeed <= 0 && direction > 0 || currentSpeed >= 0 && direction < 0)
             {
                 currentSpeed = 0;
+                isFinishedStopping = true;
                 isFullStopping = false;
                 direction = 0;
             }
