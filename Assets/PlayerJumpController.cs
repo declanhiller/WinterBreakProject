@@ -96,6 +96,7 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
         } 
     }
 
+    //flaky on rotating to actual vertical rotation and rotates infinitely until touchdown sometimes
     IEnumerator RotatePlayerToVerticalPosition()
     {
         float eulerAnglesZ = spriteTransform.eulerAngles.z;

@@ -434,7 +434,7 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 32767
   m_Sprite: {fileID: 21300000, guid: 0ae2b74b1edd14bb18dd7b65ae916a54, type: 3}
-  m_Color: {r: 1, g: 0.8395665, b: 0.6273585, a: 1}
+  m_Color: {r: 0.14471166, g: 0.5754717, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -642,6 +642,7 @@ MonoBehaviour:
   jumpForce: 130
   coyoteTime: 0.07
   jumpPoint: {fileID: 297613303}
+  spriteTransform: {fileID: 95056276}
 --- !u!70 &288872886
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
