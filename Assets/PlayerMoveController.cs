@@ -18,9 +18,7 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
 
     [SerializeField] private PhysicsMaterial2D frictionlessMaterial;
     [SerializeField] private PhysicsMaterial2D allFrictionMaterial;
-
-    [SerializeField] private Transform spriteTransform;
-
+    
     private bool isFullStopping;
 
     private bool isFinishedStopping;
@@ -125,7 +123,7 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
             vectorDirectionOfSlopePlayerIsOn = -Vector2.Perpendicular(normal).normalized;
             Debug.DrawRay(raycastHit2D.point, vectorDirectionOfSlopePlayerIsOn, Color.green);
             Debug.DrawRay(raycastHit2D.point, -vectorDirectionOfSlopePlayerIsOn, Color.red);
-            spriteTransform.rotation = Quaternion.FromToRotation(spriteTransform.up, normal) * spriteTransform.rotation;
+            transform.rotation = Quaternion.FromToRotation(transform.up, normal) * transform.rotation;
         }
     }
 

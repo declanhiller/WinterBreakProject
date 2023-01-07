@@ -607,6 +607,8 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 128
+  frictionlessMaterial: {fileID: 6200000, guid: 404abc5616962435cb97b541dc511d55, type: 2}
+  allFrictionMaterial: {fileID: 6200000, guid: 4f78b6d50b8d44e64a753e7654317ef4, type: 2}
   spriteTransform: {fileID: 95056276}
 --- !u!4 &288872882
 Transform:
@@ -617,7 +619,7 @@ Transform:
   m_GameObject: {fileID: 288872877}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.2563, y: 0.0336, z: -0.061313022}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 95056276}
@@ -656,8 +658,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1, y: 1}
+  m_Offset: {x: 0, y: 0.28242385}
+  m_Size: {x: 1, y: 1.5648477}
   m_Direction: 0
 --- !u!1 &297613302
 GameObject:

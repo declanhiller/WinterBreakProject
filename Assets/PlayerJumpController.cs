@@ -11,7 +11,6 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
     [SerializeField] private float coyoteTime = 0.3f;
 
     [SerializeField] private Transform jumpPoint;
-    [SerializeField] private Transform spriteTransform;
     
     private float coyoteTicker;
 
@@ -80,7 +79,7 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
         if (raycastHit2D.collider != null)
         {
             Vector2 normal = raycastHit2D.normal;
-            spriteTransform.rotation = Quaternion.FromToRotation(spriteTransform.up, normal) * spriteTransform.rotation;
+            transform.rotation = Quaternion.FromToRotation(transform.up, normal) * transform.rotation;
         }
     }
 
@@ -99,7 +98,7 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
     //flaky on rotating to actual vertical rotation and rotates infinitely until touchdown sometimes
     IEnumerator RotatePlayerToVerticalPosition()
     {
-        float eulerAnglesZ = spriteTransform.eulerAngles.z;
+        float eulerAnglesZ = transform.eulerAngles.z;
         int direction = eulerAnglesZ < 180 ? -1 : 1;
         while (eulerAnglesZ != 0)
         {
@@ -119,14 +118,14 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
                 }
             }
 
-            spriteTransform.Rotate(0, 0, zAngleChange);
+            transform.Rotate(0, 0, zAngleChange);
             if (setToZero)
             {
-                var eulerAngles = spriteTransform.eulerAngles;
+                var eulerAngles = transform.eulerAngles;
                 eulerAngles = new Vector3(eulerAngles.x, eulerAngles.y, 0);
-                spriteTransform.eulerAngles = eulerAngles;
+                transform.eulerAngles = eulerAngles;
             }
-            eulerAnglesZ = spriteTransform.eulerAngles.z;
+            eulerAnglesZ = transform.eulerAngles.z;
             yield return new WaitForEndOfFrame();
         }
     }
