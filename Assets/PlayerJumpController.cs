@@ -9,6 +9,8 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
     [SerializeField] private LayerMask ground;
     [SerializeField] private float jumpForce = 35;
     [SerializeField] private float coyoteTime = 0.3f;
+    [SerializeField] private float xDist = 0.3f;
+    [SerializeField] private float yDist = 0.01f;
 
     [SerializeField] private Transform jumpPoint;
     
@@ -142,7 +144,21 @@ public class PlayerJumpController : MonoBehaviour, IPlayerFunctionController {
     private bool IsGrounded() {
         RaycastHit2D raycastHit2D = Physics2D.Raycast(jumpPoint.position, Vector2.down, 0.05f, ground);
 
+
+        // Collider2D overlapBox = Physics2D.OverlapBox(jumpPoint.position, new Vector2(xDist, yDist), transform.eulerAngles.z, ground);
+
+        // Vector3 point1 = jumpPoint.position + new Vector3(xDist, yDist);
+        // Vector3 point2 = jumpPoint.position + new Vector3(xDist, -yDist);
+        // Vector3 point3 = jumpPoint.position + new Vector3(-xDist, -yDist);
+        // Vector3 point4 = jumpPoint.position + new Vector3(-xDist, yDist);
+        //
+        // Debug.DrawLine(point1, point2, Color.black);
+        // Debug.DrawLine(point2, point3, Color.black);
+        // Debug.DrawLine(point3, point4, Color.black);
+        // Debug.DrawLine(point4, point1, Color.black);
+
         bool grounded = raycastHit2D.collider != null;
+        // bool grounded = overlapBox != null;
 
         // if (grounded && canCheckForGroundTicks)
         // {
