@@ -460,7 +460,6 @@ MonoBehaviour:
   - collider: {fileID: 1808878561}
     hitboxTimer: 0.5
   debugMode: 0
-<<<<<<< HEAD
 --- !u!1 &95056275
 GameObject:
   m_ObjectHideFlags: 0
@@ -682,8 +681,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
-=======
->>>>>>> d860de32c8ff4b5832f060c66765352fd3a841ac
 --- !u!1 &288872877
 GameObject:
   m_ObjectHideFlags: 0
