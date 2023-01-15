@@ -1,0 +1,3 @@
+public enum CameraMode {
+    FOLLOW_PLAYER, SPLIT_BETWEEN_BOSS_AND_PLAYER, SHOW_SECRET, STAY
+}
