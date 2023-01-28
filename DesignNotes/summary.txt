@@ -2,8 +2,43 @@ summary of game...
 
 main character - hedgehog
 
-trying to do something idk the story yet
+idk the story yet
 
-porcupine mother or some shit and the quill from the dead mother is being used as a sword
+porcupine mother or some shit and the quill from the dead mother is being used as a spear
 
-post acopaltryic world... basically overgrown
+post apocalyptic world... basically overgrown futuristic city world with defunct robot technologies that kind of works and act as bosses now
+Bosses are very puzzled based
+
+Player Stuff
+ - Regular Jump
+ - Regular Run
+ - Very simple stab attack for now
+ - Grappling Hook that can pull you to the location you grappled immediately
+ - Climbing... basically like sticking to the wall and going up and down it... will also be a rappel animation to go over the edge and when a player jumps to an edge and misses slightly
+
+ Player Animations
+ - jump
+ - fall
+ - run
+ - wind up grapple
+ - throw grapple
+ - trigger grapple
+ - attack (spear stab)
+ - climb
+ - rapple over edge
+ - and whatever tweening animations may be necessary depending on animation technique
+
+Player Stuff I'm not too sure about
+- Using spear as a platform to spin to greater heights
+- Swinging using grappling hook
+- Super jump boop. basically a yin yang relationship with the grapple
+- Adjustable attack sequences
+- Comboes with grapple and regular attack
+- Special upgrades to spear that allows you to use it in different and unique ways to move around... a playstyle basically
+
+Other Stuff
+    Need a camera pathing tool to handle zooming out and zooming in to show scale of bosses while making levels actually playable
+    Might also need to create a procedurally generated pathing tool to handle more procedurally generated fights...
+    or set it so that each piece has predisposed pathing and then picking what piece goes next
+
+    Need to really make it so that there aren't seperate scenes when going from "level" to "level"
