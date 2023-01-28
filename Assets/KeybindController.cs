@@ -25,15 +25,15 @@ public class KeybindController : MonoBehaviour {
         return camera.ScreenToWorldPoint(keybinds.Player.MousePos.ReadValue<Vector2>());
     }
 
-    public void SetStartGrappleListener(Action<InputAction.CallbackContext> grapplerListener) {
+    public void AddStartGrappleListener(Action<InputAction.CallbackContext> grapplerListener) {
         keybinds.Player.Grapple.started += grapplerListener;
     }
 
-    public void SetEndGrappleListener(Action<InputAction.CallbackContext> grapplerListener) {
+    public void AddEndGrappleListener(Action<InputAction.CallbackContext> grapplerListener) {
         keybinds.Player.Grapple.canceled += grapplerListener;
     }
 
-    public void SetStartAttackListener(Action<InputAction.CallbackContext> attackListener)
+    public void AddAttackStartListener(Action<InputAction.CallbackContext> attackListener)
     {
         keybinds.Player.Attack.started += attackListener;
     }

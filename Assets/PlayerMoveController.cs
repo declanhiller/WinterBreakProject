@@ -13,6 +13,7 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
     
 
     [SerializeField] private Transform playerFeet;
+    [SerializeField] private Transform movingDetectorTransform;
     [SerializeField] private LayerMask groundMask;
 
     [SerializeField] private float maxAngle = 60f;
@@ -20,6 +21,8 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
     private KeybindController keybindController;
     private PlayerController playerController;
     private Rigidbody2D rb;
+
+    private float sideAngle;
 
     [SerializeField] private PhysicsMaterial2D frictionlessMaterial;
     [SerializeField] private PhysicsMaterial2D allFrictionMaterial;
@@ -61,12 +64,11 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
 
         bool isBelowMaxAngle = RotateNormalsToCorrectOrientation();
 
+
         if (!isFlyingThroughAir)
         {
-            if (isBelowMaxAngle)
-            {
-                velocity = GroundedMovement(inputtedValue);
-            }
+
+            velocity = GroundedMovement(inputtedValue);
         }
         else
         {
@@ -74,9 +76,31 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
             velocity = AerialMovement(inputtedValue);
         }
 
-        rb.sharedMaterial = inputtedValue == 0 ? allFrictionMaterial : frictionlessMaterial;
+        if (transform.eulerAngles.z > maxAngle) {
+            rb.sharedMaterial = frictionlessMaterial;
+        } else {
+            rb.sharedMaterial = inputtedValue == 0 ? allFrictionMaterial : frictionlessMaterial;
+        }
+        
+        
 
         rb.velocity = velocity;
+    }
+
+    private float CalculateSideSlopeAngle() { 
+        RaycastHit2D raycastHit2D = Physics2D.Raycast(movingDetectorTransform.position, movingDetectorTransform.right * direction, 0.05f, groundMask);
+        Debug.DrawRay(movingDetectorTransform.position, movingDetectorTransform.right.normalized * direction, Color.red);
+        if (raycastHit2D.collider == null) {
+            return 0;
+        }
+        
+        Debug.Log(raycastHit2D.collider.gameObject.name);
+        
+        Debug.DrawRay(raycastHit2D.point, raycastHit2D.normal, Color.yellow);
+        
+        Vector2 surfaceNormal = raycastHit2D.normal;
+
+        return Vector2.Angle(surfaceNormal, Vector2.up);
     }
 
     private Vector2 GroundedMovement(float inputtedValue)
@@ -126,7 +150,12 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
             direction = inputtedValue > 0 ? 1 : -1;
         }
         
-        Debug.DrawRay(transform.position, currentSpeed * vectorDirectionOfSlopePlayerIsOn, Color.black);
+        // Debug.DrawRay(transform.position, currentSpeed * vectorDirectionOfSlopePlayerIsOn, Color.black);
+        
+        // float sideSlopeAngle = CalculateSideSlopeAngle();
+        // if (sideSlopeAngle > maxAngle) {
+        //     currentSpeed = 0;
+        // }
         
         return currentSpeed * vectorDirectionOfSlopePlayerIsOn;
         
@@ -139,17 +168,18 @@ public class PlayerMoveController : MonoBehaviour, IPlayerFunctionController {
         {
             Vector2 normal = raycastHit2D.normal;
             vectorDirectionOfSlopePlayerIsOn = -Vector2.Perpendicular(normal).normalized;
-            Debug.DrawRay(raycastHit2D.point, vectorDirectionOfSlopePlayerIsOn, Color.green);
-            Debug.DrawRay(raycastHit2D.point, -vectorDirectionOfSlopePlayerIsOn, Color.red);
-            Debug.DrawRay(raycastHit2D.point, Vector2.up, Color.magenta);
-            Debug.DrawRay(raycastHit2D.point, normal, Color.yellow);
-            if (Math.Abs(Vector2.SignedAngle(Vector2.up, normal)) < maxAngle)
-            {
-                transform.rotation = Quaternion.FromToRotation(transform.up, normal) * transform.rotation;
-                return true;
-            }
+            // Debug.DrawRay(raycastHit2D.point, vectorDirectionOfSlopePlayerIsOn, Color.green);
+            // Debug.DrawRay(raycastHit2D.point, -vectorDirectionOfSlopePlayerIsOn, Color.red);
+            // Debug.DrawRay(raycastHit2D.point, Vector2.up, Color.magenta);
+            // Debug.DrawRay(raycastHit2D.point, normal, Color.yellow);
+            // if (Math.Abs(Vector2.SignedAngle(Vector2.up, normal)) < maxAngle)
+            // {
+            //     transform.rotation = Quaternion.FromToRotation(transform.up, normal) * transform.rotation;
+            //     return true;
+            // }
+            transform.rotation = Quaternion.FromToRotation(transform.up, normal) * transform.rotation;
         }
-        transform.rotation = Quaternion.Euler(0, 0, 0);
+        // transform.rotation = Quaternion.Euler(0, 0, 0);
         return false;
     }
 

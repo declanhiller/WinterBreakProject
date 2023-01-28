@@ -19,6 +19,7 @@ public class PlayerSpearController : MonoBehaviour, IPlayerFunctionController
 
     private Collider2D currentActiveHitbox;
     
+
     private void Awake()
     {
         foreach (Hitbox hitbox in hitboxes)
@@ -29,8 +30,7 @@ public class PlayerSpearController : MonoBehaviour, IPlayerFunctionController
         playerController.AddFunction(this);
     }
 
-    public void Attack(InputAction.CallbackContext context)
-    {
+    public void Attack(InputAction.CallbackContext context) {
         Hitbox hitbox = hitboxes[seqeunceNumber];
         hitbox.collider.enabled = true;
         currentActiveHitbox = hitbox.collider;
@@ -62,8 +62,18 @@ public class PlayerSpearController : MonoBehaviour, IPlayerFunctionController
 
     public void SetKeybinds(KeybindController keybindController)
     {
-        keybindController.SetStartAttackListener(Attack);
+        keybindController.AddAttackStartListener(Attack);
+
     }
+
+    public void StartAimingGrapple(InputAction.CallbackContext context) {
+        
+    }
+
+    public void StopAimingGrapple(InputAction.CallbackContext context) {
+
+    }
+    
 
     public void ReceiveMessage(string msg)
     {

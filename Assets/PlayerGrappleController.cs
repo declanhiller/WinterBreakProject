@@ -42,8 +42,8 @@ public class PlayerGrappleController : MonoBehaviour
 
     private void Start()
     {
-        keybindController.SetStartGrappleListener(StartGrappleAction);
-        keybindController.SetEndGrappleListener(EndGrappleAction);
+        keybindController.AddStartGrappleListener(StartGrappleAction);
+        keybindController.AddEndGrappleListener(EndGrappleAction);
         boundary.enabled = false;
         grappleAimer.enabled = false;
         grapple.enabled = false;
