@@ -19,7 +19,7 @@ namespace Player.Spear {
         
         public void Update() {
             while (timer > 0) {
-                timer = attackTime
+                timer = attackTime;
             }
         }
 

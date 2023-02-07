@@ -11,8 +11,6 @@ public class PlayerGrappleController : MonoBehaviour
     
     [SerializeField] private float slowedDownTime = 0f;
     [SerializeField] private float timeRate = 0.1f;
-    [SerializeField] private float grappleTimeLimit = 1f;
-    [SerializeField] private float spriteScale = 1f;
     [SerializeField] private float radius = 5f;
     [SerializeField] private LayerMask grapplePointMask;
     [SerializeField] private float grappleSpeed = 10f;
@@ -21,9 +19,9 @@ public class PlayerGrappleController : MonoBehaviour
     private float fixedDeltaTime;
     
     
-    [SerializeField] private GrappleBoundary boundary;
-    [SerializeField] private GrappleAimer grappleAimer;
-    [SerializeField] private Grapple grapple;
+    // [SerializeField] private GrappleBoundary boundary;
+    // [SerializeField] private GrappleAimer grappleAimer;
+    // [SerializeField] private Grapple grapple;
     
     private KeybindController keybindController;
 
@@ -44,9 +42,9 @@ public class PlayerGrappleController : MonoBehaviour
     {
         keybindController.AddStartGrappleListener(StartGrappleAction);
         keybindController.AddEndGrappleListener(EndGrappleAction);
-        boundary.enabled = false;
-        grappleAimer.enabled = false;
-        grapple.enabled = false;
+        // boundary.enabled = false;
+        // grappleAimer.enabled = false;
+        // grapple.enabled = false;
         defaultTimeScale = Time.timeScale;
         this.fixedDeltaTime = Time.fixedDeltaTime;
     }
@@ -54,10 +52,10 @@ public class PlayerGrappleController : MonoBehaviour
     private void Update()
     {
 
-        if (grapple.DidHookConnect())
-        {
-            state = GrappleState.CONNECTED;
-        }
+        // if (grapple.DidHookConnect())
+        // {
+        //     state = GrappleState.CONNECTED;
+        // }
         
         switch (state)
         {
@@ -81,15 +79,15 @@ public class PlayerGrappleController : MonoBehaviour
     {
         if (state == GrappleState.STOWED)
         {
-            grappleAimer.enabled = true;
-            boundary.enabled = true;
+            // grappleAimer.enabled = true;
+            // boundary.enabled = true;
             state = GrappleState.AIMING;
             slowDownCoroutine = StartCoroutine(SlowDownTime(slowedDownTime));
             playerController.SendMsg(GRAPPLE_STARTED);
         }
         else if (state == GrappleState.CONNECTED)
         {
-            grapple.enabled = false;
+            // grapple.enabled = false;
             state = GrappleState.STOWED;
             playerController.SendMsg(GRAPPLE_ENDED);
         }
@@ -99,8 +97,8 @@ public class PlayerGrappleController : MonoBehaviour
     {
         Vector2 mousePos = keybindController.ReadMouseValueInWorld();
         Vector2 startPointPos = transform.position;
-        grappleAimer.UpdateCrosshair(mousePos);
-        boundary.RenderCircle(radius, startPointPos);
+        // grappleAimer.UpdateCrosshair(mousePos);
+        // boundary.RenderCircle(radius, startPointPos);
     }
 
     private void EndGrappleAction(InputAction.CallbackContext context)
@@ -108,12 +106,12 @@ public class PlayerGrappleController : MonoBehaviour
         if (state == GrappleState.AIMING)
         {
             RestoreTime();
-            grappleAimer.enabled = false; 
-            boundary.enabled = false;
+            // grappleAimer.enabled = false; 
+            // boundary.enabled = false;
             state = GrappleState.SHOOTING;
-            grapple.enabled = true;
-            grapple.StartGrappleShoot(grappleAimer.GetDirection(), radius);
-            grapple.SetOnGrapple(OnGrapple);
+            // grapple.enabled = true;
+            // grapple.StartGrappleShoot(grappleAimer.GetDirection(), radius);
+            // grapple.SetOnGrapple(OnGrapple);
         }
     }
 
